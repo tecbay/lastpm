@@ -80,9 +80,16 @@
             @endif
 
             <div class="content">
-                <div class="title m-b-md">
-                    LastPm
-                </div>
+
+                    <ul>
+                        @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                            <li>
+                                <a rel="alternate" hreflang="{{ $localeCode }}" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+                                    {{ $properties['native'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
 
                 <div class="links">
                     <a href="https://laravel.com/docs">Documentation</a>
