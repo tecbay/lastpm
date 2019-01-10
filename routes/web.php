@@ -48,7 +48,7 @@ Route::group( [ 'middleware' => [ 'auth' ] ], function () {
 			'localeViewPath',
 			'localize'
 		], function () {
-			Route::get( '/user', 'HomeController' )->name( 'user.home' );
+			Route::get( '/drive', 'HomeController' )->name( 'user.home' );
 			Route::get( LaravelLocalization::transRoute( 'routes.posts' ), function () {
 				return view( 'home' );
 			} )->name( 'post.all' );
