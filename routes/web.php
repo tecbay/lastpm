@@ -1,24 +1,13 @@
 <?php
 
-//<editor-fold desc="Login Routes">
-Route::get( 'password/reset/{token}', 'Auth\ResetPasswordController@showResetForm' );
+
 Route::group( [
 	'prefix'     => LaravelLocalization::setLocale(),
 	'middleware' => [ 'localeSessionRedirect', 'localizationRedirect', 'localeViewPath', 'localize' ]
 ], function () {
-	// Authentication Routes...
-	Route::get( 'login', 'Auth\LoginController@showLoginForm' );
-	// Registration Routes...
-	Route::get( 'register', 'Auth\RegisterController@showRegistrationForm' )->name( 'register' );
-	// Password Reset Routes...
-	Route::get( 'password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm' );
+	Auth::routes( [ 'verify' => true ] );
 } );
-Route::post( 'login', 'Auth\LoginController@login' )->name( 'login' );
-Route::post( 'register', 'Auth\RegisterController@register' )->name( 'register' );
-Route::post( 'password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail' );
-Route::post( 'password/reset', 'Auth\ResetPasswordController@reset' );
-Route::post( 'logout', 'Auth\LoginController@logout' )->name( 'logout' );
-//</editor-fold>
+
 // +++++++++++++++++++++Guest route group+++++++++++++++++++++++++++++++++++++++++++++++++++
 //<editor-fold desc="Guest Routes group">
 Route::group( [
@@ -50,7 +39,7 @@ Route::group( [ 'middleware' => [ 'auth' ] ], function () {
 	Route::group( [
 		'namespace'  => 'User',
 		'prefix'     => LaravelLocalization::setLocale(),
-		'middleware' => [ 'role:user' ]
+		'middleware' => [ 'role:user', 'verified' ]
 	], function () {
 		//++++ Localized Route Group
 		Route::group( [
@@ -69,9 +58,6 @@ Route::group( [ 'middleware' => [ 'auth' ] ], function () {
 			} )->name( 'post' );
 		} );
 		//++++ Localized Route Group xxxxxx End
-
-
-
 	} );
 	//</editor-fold>
 } );
