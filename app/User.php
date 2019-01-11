@@ -11,6 +11,7 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable;
 	use HasRoles;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -28,4 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+	public function folders(  ) {
+		return $this->hasMany('App\Models\Folder');
+    }
 }

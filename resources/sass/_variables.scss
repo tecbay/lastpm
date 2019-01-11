@@ -82,7 +82,7 @@ $colors: map-merge(
                 $colors
 );
 
-$primary:       $white !default;
+$primary:       $pink !default;
 $secondary:     $black !default;
 $success:       $green !default;
 $info:          $cyan !default;
@@ -90,3 +90,8 @@ $warning:       $yellow !default;
 $danger:        $red !default;
 $light:         $gray-100 !default;
 $dark:          $gray-800 !default;
+
+.badge-danger {
+  color: #fff;
+  background-color: $green !important;
+}

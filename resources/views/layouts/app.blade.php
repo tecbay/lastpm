@@ -18,11 +18,11 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 
-<body id="page-top">
+<body id="page-top" class="bg-light">
 <div id="app">
     <nav class="navbar navbar-expand navbar-laravel  static-top">
         <div class="p-1">
-            <button class="btn btn-link btn text-white order-1 order-sm-0" @click="sidebarToggle" href="#">
+            <button class="btn btn-link btn text-primary order-1 order-sm-0" @click="sidebarToggle" href="#">
                 <i class="fas fa-bars"></i>
             </button>
         </div>

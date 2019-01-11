@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Controllers\FolderController;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -68,8 +69,13 @@ class Kernel extends HttpKernel
         'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
         'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
         'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,
-        'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class
+        'localeViewPath' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationViewPath::class,
 	    //endregion
+	    'CheckFolderViewPermission' => \App\Http\Middleware\FolderController\CheckViewPermission::class,
+	    'CheckFolderEditPermission' => \App\Http\Middleware\FolderController\CheckEditPermission::class,
+	    'CheckFolderDeletePermission' => \App\Http\Middleware\FolderController\CheckDeletePermission::class,
+	    'CheckFolderUploadPermission' => \App\Http\Middleware\FolderController\CheckUploadPermission::class,
+
     ];
 
     /**
