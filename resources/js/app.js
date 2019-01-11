@@ -1,4 +1,3 @@
-
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -6,9 +5,12 @@
  */
 
 require('./bootstrap');
-
+require('./template/sb-admin');
+import $ from "jquery";
+import Element from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
 window.Vue = require('vue');
-
+Vue.use(Element)
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -29,5 +31,12 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
  */
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    methods: {
+        sidebarToggle(e) {
+            e.preventDefault();
+            $("body").toggleClass("sidebar-toggled");
+            $(".sidebar").toggleClass("toggled");
+        }
+    }
 });
