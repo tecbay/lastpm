@@ -11,6 +11,12 @@ class CreateFolder extends FormRequest {
 	 * @return bool
 	 */
 	public function authorize() {
+
+		$contacts=$this->contacts;
+
+//		auth()->user()->contacts->whereIn
+
+//		dd($this);
 		return true;
 	}
 
@@ -21,8 +27,10 @@ class CreateFolder extends FormRequest {
 	 */
 	public function rules() {
 		return [
-			'folder_name' => 'required|integer',
+			'name' => 'required|integer',
 			'password'    => 'required'
 		];
 	}
+
+
 }

@@ -1,5 +1,16 @@
 <?php
+//todo : shoud remove in Production
+Route::get( '/ajaxtest', function (){
 
+	$folder=\App\Models\Folder::find(3);
+
+//	$folder->viewers()->attach([1,2]);
+
+dd($folder->addViewers([1,2]));
+//dd($folder->removeViewers([1,2]));
+
+	return view('ajaxtest');
+});
 
 Route::group( [
 	'prefix'     => LaravelLocalization::setLocale(),
@@ -56,9 +67,20 @@ Route::group( [
 			return view( 'home' );
 		} )->name( 'post.all' );
 
-		Route::get( '/post/1', function ( $as ) {
-			return view( 'home' );
-		} )->name( 'post' );
+
+
+
+		Route::resource('file', 'FileController',
+			['only' => ['store', 'update','destroy']]);
+		Route::resource('folder', 'FolderController',
+			['only' => ['index','show','store','update','destroy']]);
+
+		Route::get('folder','FolderController@index');
+		Route::post('folder','FolderController@store');
+		Route::get('folder/{id}','FolderController@show');
+		Route::get('delete/folder/{id}','FolderController@destroy');
+//		Route::delete('delete/folder/{id}','FolderController@destroy');
+
 
 	} );
 	//</editor-fold>
@@ -66,15 +88,12 @@ Route::group( [
 
 	//<editor-fold desc="Common routes">
 	Route::group( [
-		'middleware' => [ 'role:user|admin' ]
+		'middleware' => [ 'role:user' ]
 	], function () {
 
 
 
-		Route::resource('file', 'FileController',
-			['only' => ['store', 'update','destroy']]);
 
-		Route::get('creat/folder','FolderController@store');
 //		Route::resource('folder', 'FolderController',
 //			['except' => ['create', 'store', 'update', 'destroy']]);
 	} );

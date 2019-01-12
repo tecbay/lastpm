@@ -15,7 +15,7 @@ class CreateFoldersTable extends Migration {
 			$table->increments( 'id' );
 			$table->string( 'name' );
 			$table->string( 'path' );
-			$table->string( 'storage_type' );
+			$table->unsignedBigInteger( 'folder_size' );
 			$table->string( 'password' );
 			$table->unsignedBigInteger( 'user_id' );
 			$table->timestamps();
