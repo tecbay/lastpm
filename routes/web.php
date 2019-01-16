@@ -1,16 +1,16 @@
 <?php
 //todo : shoud remove in Production
-Route::get( '/ajaxtest', function (){
-
-	$folder=\App\Models\Folder::find(3);
-
-//	$folder->viewers()->attach([1,2]);
-
-dd($folder->addViewers([1,2]));
-//dd($folder->removeViewers([1,2]));
-
-	return view('ajaxtest');
-});
+//Route::get( '/ajaxtest', function (){
+//
+//	dd(auth()->user()->is_bill_payer());
+//
+////	$folder->viewers()->attach([1,2]);
+//
+//dd($folder->addViewers([1,2]));
+////dd($folder->removeViewers([1,2]));
+//
+//	return view('ajaxtest');
+//});
 
 Route::group( [
 	'prefix'     => LaravelLocalization::setLocale(),
@@ -78,8 +78,7 @@ Route::group( [
 		Route::get('folder','FolderController@index');
 		Route::post('folder','FolderController@store');
 		Route::get('folder/{id}','FolderController@show');
-		Route::get('delete/folder/{id}','FolderController@destroy');
-//		Route::delete('delete/folder/{id}','FolderController@destroy');
+		Route::post('delete/folder/{id}','FolderController@destroy');
 
 
 	} );

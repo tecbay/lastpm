@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,6 +12,15 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements MustVerifyEmail {
 	use Notifiable;
 	use HasRoles;
+
+
+	protected $attributes = [
+		'used_spaces'   => 0,
+		'plan_id'       => null,
+		'is_subscriber' => false,
+		'start_at'      => null,
+		'end_at'        => null,
+	];
 
 	/**
 	 * The attributes that are mass assignable.
@@ -33,14 +43,6 @@ class User extends Authenticatable implements MustVerifyEmail {
 		'remember_token',
 	];
 
-	public function folders() {
-		return $this->hasMany( 'App\Models\Folder' );
-	}
-
-	public function contacts() {
-		return $this->hasMany('App\Models\Contact');
-	}
-
 	public static function boot() {
 		parent::boot();
 		self::creating( function ( $model ) {
@@ -48,4 +50,25 @@ class User extends Authenticatable implements MustVerifyEmail {
 		} );
 	}
 
+	public function folders() {
+		return $this->hasMany( 'App\Models\Folder' );
+	}
+
+	public function plan() {
+		return $this->hasOne( 'App\Models\Plan' );
+	}
+
+	public function contacts() {
+		return $this->hasMany( 'App\Models\Contact' );
+	}
+
+	public function is_subscriber() {
+		return $this->is_subscriber;
+	}
+
+	public function is_bill_payer() {
+		$subscribe_end_at = new Carbon( $this->end_at );
+
+		return $subscribe_end_at->gt( Carbon::now() );
+	}
 }
