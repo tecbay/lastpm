@@ -9,21 +9,25 @@ require('./template/sb-admin');
 import $ from "jquery";
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import Vuex from 'vuex';
+
 window.Vue = require('vue');
+Vue.use(Vuex);
 Vue.use(Element)
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
 
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+const store = new Vuex.Store({
+    state: {
+        count: 0
+    },
+    mutations: {
+        increment (state) {
+            state.count++
+        }
+    }
+})
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-
+import Drive from './components/user/drive.vue'
+import Contact from './components/user/contact.vue'
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -32,11 +36,20 @@ Vue.component('example-component', require('./components/ExampleComponent.vue').
 
 const app = new Vue({
     el: '#app',
+    store,
+    data:{
+        loading:true
+    },
     methods: {
         sidebarToggle(e) {
             e.preventDefault();
             $("body").toggleClass("sidebar-toggled");
             $(".sidebar").toggleClass("toggled");
         }
+    },
+    components: {
+        Drive,
+        Contact
     }
 });
+

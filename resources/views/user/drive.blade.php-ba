@@ -1,0 +1,376 @@
+@extends('layouts.app')
+
+@section('content')
+    <div id="drive" class="row">
+        <div class="col-md-12 col-sm-12 col-lg-12">
+            <el-progress :show-text="true" :text-inside="true" :stroke-width="18" :percentage="diskUsed"
+                         v-bind:status="diskStatus(diskUsed)">
+
+            </el-progress>
+            <p class="text-center">Disk Used : <span v-text="diskUsed"></span> % </p>
+            <hr>
+        </div>
+        <div class="col-md-3 col-sm-3 col-lg-3">
+            <ul class="list-group" style="background: #fff">
+                <h4 class="text-info" style="margin: 0px !important;padding: 8px;border-bottom: 1px solid;">
+                    <span style="line-height: 1.7;">
+                    Folders
+                    </span>
+                    <span class="pull-right">
+                        <button @click="getContacts()" data-toggle="modal" data-target="#crF"
+                                class="btn btn-primary btn-sm">
+                            <i class="icon-btn fa fa-folder-plus"></i>
+                            &nbsp;Create
+                        </button>
+                    </span>
+                </h4>
+                <li v-for="(folder,index) in folders" v-if="folders" class="list-group-item"
+                    v-bind:class="currentFolder.id==folder.id ? 'active' : ''"
+                    style="border: none!important">
+
+                    <a @click="getFolder(folder.id)" href="#">
+                        <i class="far"
+                           v-bind:class="currentFolder==folder.id ? 'fa-folder-open' : 'fa-folder'"
+                           v-html="' '+folder.name"
+                           style="font-size: 22px"
+                        ></i>
+
+                    </a>
+                </li>
+                <li style="border: none!important;padding-left: 20px!important" class="list-group-item"
+                    v-if="folders.length==0">
+                    <p class="text-center" v-text="folderNotFound"></p>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-8 col-sm-8 col-lg-8">
+            <ol class="breadcrumb">
+                <li><a @click="onClickHome()" href="#"><i class="fa fa-home fa-2x"></i></a></li>
+                <li v-if="folderName" v-html="folderName"></li>
+                <div v-if="currentFolder>0" class="pull-right">
+                    <el-tooltip class="item" effect="dark" content="Upload files" placement="top">
+                        <i data-toggle="modal" data-target="#updia"
+                           class="fa-2x"
+                           v-bind:class="'icon-btn fa fa-cloud-upload-alt'"></i>
+                    </el-tooltip>
+                    <el-tooltip class="item" effect="dark" content="Folder info" placement="top">
+                        <i @click="onInfoFolder()" class="fa-2x" v-bind:class="'icon-btn fa fa-info-circle'"></i>
+                    </el-tooltip>
+                    &nbsp;
+                    <el-tooltip class="item" effect="dark" content="Share this folder" placement="top">
+                        <i @click="onShareFolder()" class="fa-2x" v-bind:class="'icon-btn fa fa-share-alt-square'"></i>
+                    </el-tooltip>
+                    &nbsp;
+                    {{--<el-tooltip class="item" effect="dark" content="Rename this folder" placement="top">--}}
+                    {{--<i @click="onRenameFolder()" class="fa-2x" v-bind:class="'icon-btn fa fa-edit'"></i>--}}
+                    {{--</el-tooltip>--}}
+                    &nbsp;
+                    <el-tooltip class="item" effect="dark" content="Delete this folder" placement="top">
+                        <i @click="onDeleteFolder()" class="fa-2x" v-bind:class="'icon-btn fa fa-trash'"></i>
+                    </el-tooltip>
+                </div>
+            </ol>
+            <div>
+                <table v-if="currentFolder>0" v-loading="Tloading"
+                       class="table">
+                    <thead>
+                    <th v-text="fileName"></th>
+                    <th v-text="fileSize"></th>
+                    <th v-text="fileUpdateAt"></th>
+                    <th v-text="Action"></th>
+                    </thead>
+                    <tr v-for="file in files">
+                        <td style="font-size: 14px;width: 60%;">
+                            <a target="_blank"
+                               :href="file.url">
+                                <i class="fa-2x" v-bind:class="'fa fa-file'"></i>
+                                <span v-html="file.name"></span>
+                            </a>
+                        </td>
+                        <td>
+                            <span v-html="file.size"></span>
+                        </td>
+                        <td></td>
+                        <td>
+                            <i @click="onDeleteFile(file.id,file.name)"
+                               v-bind:class="'icon-btn glyphicon glyphicon-trash'"></i>
+                        </td>
+                    </tr>
+                </table>
+
+                <div v-if="folders.length==0" v-bind:class="'jumbotron'">
+                    <h2 class="text-center">
+                        <i class="fa-3x" v-bind:class="'fa fa-comment'"></i>
+                    </h2>
+                    <h4 class="text-center" v-text="'Folder not found'"></h4>
+                </div>
+
+                <div v-if="currentFolder==0 & folders.length>0" class="jumbotron">
+                    <div class="row">
+                        <div v-for="(folder,index) in folders" class="col-xs-6 col-md-3">
+                            <div>
+                                <p @click="getFolder(folder.id)"
+                                   class="text-center text- icon-btn folders-class">
+                                    <i class="fas fa-folder fa-3x"></i>
+                                    <br>
+                                    <span v-text="folder.name"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Share modal -->
+            <div class="modal fade" id="shareMOdel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span
+                                        aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Share "<span v-html="folderName"></span>" with ..
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                            <div class="form-group pull-right" style="width: 50%">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-search"></i>
+                                    </div>
+                                    <input class="form-control" v-model="search" type="text"
+                                           placeholder="Search....">
+                                </div>
+                            </div>
+                            </p>
+                            <el-table
+                                    empty-text="Not found"
+                                    max-height="600"
+                                    v-loading="loadingContact"
+                                    ref="selectedContact"
+                                    :data="haveNotAccess.filter(data => !search
+                                    || data.first_name.toLowerCase().includes(search.toLowerCase())
+                                    || data.last_name.toLowerCase().includes(search.toLowerCase())
+                                    || data.email.toLowerCase().includes(search.toLowerCase())
+                                    || data.phone.toLowerCase().includes(search.toLowerCase())
+                                    )"
+                                    style="width: 100%"
+                                    @selection-change="handleSelectionChange">
+                                <el-table-column
+                                        type="selection"
+                                        width="55">
+                                </el-table-column>
+                                <el-table-column
+                                        property="first_name"
+                                        label="First Name"
+                                        width="120">
+                                </el-table-column>
+                                <el-table-column
+                                        property="last_name"
+                                        label="Last Name"
+                                        width="120">
+                                </el-table-column>
+                                <el-table-column
+                                        property="email"
+                                        label="Email"
+                                        width="120">
+                                </el-table-column>
+                                <el-table-column
+                                        property="phone"
+                                        label="Phone"
+                                        show-overflow-tooltip>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" @click="addFolderAccess()" class="btn btn-primary">
+                                Give Access
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{--Create folder model--}}
+            <div id="crF" class="modal fade" tabindex="-1" role="dialog"
+                 aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span
+                                        aria-hidden="true">&times;</span><span
+                                        class="sr-only">Close</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Create Folder</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <form @submit="onCreateFolder()" id="cfForm" role="form">
+                                    <div class="col-md-6">
+                                        <input onfocus="this.removeAttribute('readonly');" readonly required type="text"
+                                               class="form-control"
+                                               name="folder_name"
+                                               placeholder="Folder Name">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input onfocus="this.removeAttribute('readonly');" readonly required
+                                               type="password" class="form-control"
+                                               name="password"
+                                               placeholder="Password for the folder">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="">
+                                <hr>
+                                <p>
+                                    <span class="pull-left">Give Folder Access to . . .</span>
+                                <div class="form-group pull-right" style="width: 50%">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-search"></i>
+                                        </div>
+                                        <input autocomplete="off" class="form-control" v-model="search" type="text"
+                                               placeholder="Search....">
+                                    </div>
+                                </div>
+                                </p>
+                                <el-table
+                                        empty-text="No Contact Found"
+                                        max-height="600"
+                                        v-loading="loadingContact"
+                                        ref="selectedContact"
+                                        :data="contactList.filter(data => !search
+                                    || data.first_name.toLowerCase().includes(search.toLowerCase())
+                                    || data.last_name.toLowerCase().includes(search.toLowerCase())
+                                    || data.email.toLowerCase().includes(search.toLowerCase())
+                                    || data.phone.toLowerCase().includes(search.toLowerCase())
+                                    )"
+                                        style="width: 100%"
+                                        @selection-change="handleSelectionChange">
+                                    <el-table-column
+                                            type="selection"
+                                            width="55">
+                                    </el-table-column>
+                                    <el-table-column
+                                            property="first_name"
+                                            label="First Name"
+                                            width="120">
+                                    </el-table-column>
+                                    <el-table-column
+                                            property="last_name"
+                                            label="Last Name"
+                                            width="120">
+                                    </el-table-column>
+                                    <el-table-column
+                                            property="email"
+                                            label="Email"
+                                            width="120">
+                                    </el-table-column>
+                                    <el-table-column
+                                            property="phone"
+                                            label="Phone"
+                                            show-overflow-tooltip>
+                                    </el-table-column>
+                                </el-table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button form="cfForm" type="submit" class="btn btn-primary">
+                                <i class="glyphicon glyphicon-plus"></i>
+                                Create
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {{--upload modal--}}
+            <div id="updia" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog"
+                 aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content" style="width: 393px;">
+                        <div class="modal-body">
+                            <el-upload
+                                    class="upload-demo"
+                                    drag
+                                    action="{{route('file.upload')}}"
+                                    multiple
+                                    :headers="headers"
+                                    :data="{'folderId':currentFolder}"
+                                    :on-success="onSuccessUpload"
+                                    :on-error="onErrorUpload"
+                                    :on-progress="onProgress"
+                            >
+                                <i class="el-icon-upload"></i>
+                                <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+                            </el-upload>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{--Folder Info--}}
+            <div id="folderInfo" class="modal fade" tabindex="-1" role="dialog"
+                 aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span
+                                        aria-hidden="true">&times;</span><span
+                                        class="sr-only">Close</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Folder Info</h4>
+                        </div>
+                        <div class="modal-body">
+
+
+                            <h4>Folder Name : &nbsp;<span v-if="currentFolderObj" v-text="currentFolderObj.name"></span>
+                            </h4>
+
+                            <h4>Folder Password : &nbsp;<span v-if="currentFolderObj"
+                                                              v-text="currentFolderObj.password"></span></h4>
+                            <h3>
+                                <hr>
+                                Have Access
+                            </h3>
+                            <el-table
+                                    v-if="currentFolderObj"
+                                    :data="haveAccess"
+                                    style="width: 100%">
+                                <el-table-column
+                                        prop="first_name"
+                                        label="First Name"
+                                        width="180">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="last_name"
+                                        label="Last Name"
+                                        width="180">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="email"
+                                        label="Email">
+                                </el-table-column>
+                                <el-table-column
+                                        label="Action">
+                                    <template slot-scope="scope">
+                                        <el-button @click="removeAccess(scope.row.id)" type="danger" round size="small">
+                                            Remove
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

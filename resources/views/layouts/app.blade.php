@@ -118,7 +118,7 @@
         <!--End Sidebar -->
         @endauth
         <div id="content-wrapper">
-            <div class="container-fluid">
+            <div class="container-fluid" >
                 @yield('content')
             </div>
             <!-- /.container-fluid -->
@@ -158,5 +158,6 @@
 </div>
 <!-- Scripts -->
 <script src="{{ asset('js/app.js') }}" defer></script>
+
 </body>
 </html>

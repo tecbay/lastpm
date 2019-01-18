@@ -99,4 +99,8 @@ class FolderController extends Controller {
 	public function addViewers() {
 
 	}
+
+	public function removeViewers() {
+
+	}
 }

@@ -14,6 +14,7 @@ class User extends Authenticatable implements MustVerifyEmail {
 	use HasRoles;
 
 
+
 	protected $attributes = [
 		'used_spaces'   => 0,
 		'plan_id'       => null,
@@ -55,7 +56,7 @@ class User extends Authenticatable implements MustVerifyEmail {
 	}
 
 	public function plan() {
-		return $this->hasOne( 'App\Models\Plan' );
+		return $this->belongsTo( 'App\Models\Plan' );
 	}
 
 	public function contacts() {
@@ -70,5 +71,9 @@ class User extends Authenticatable implements MustVerifyEmail {
 		$subscribe_end_at = new Carbon( $this->end_at );
 
 		return $subscribe_end_at->gt( Carbon::now() );
+	}
+
+	public function transection(  ) {
+		return $this->hasMany('App\Models\Transection');
 	}
 }
